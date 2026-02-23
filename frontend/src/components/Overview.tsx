@@ -1,0 +1,139 @@
+import { useState, useEffect } from "react";
+import type { Household, Milestone, Memory } from "../types";
+import * as api from "../api";
+
+interface Props {
+  household: Household;
+  onNavigate: (tab: string) => void;
+}
+
+export default function Overview({ household, onNavigate }: Props) {
+  const [memoryCount, setMemoryCount] = useState(0);
+  const [milestones, setMilestones] = useState<Milestone[]>([]);
+  const [recent, setRecent] = useState<Memory[]>([]);
+
+  useEffect(() => {
+    api.getMemories({ per_page: 3 }).then((r) => {
+      setMemoryCount(r.total);
+      setRecent(r.memories);
+    }).catch(() => {});
+    api.getMilestones().then(setMilestones).catch(() => {});
+  }, []);
+
+  const upcoming = milestones.filter((m) => m.days_until != null && m.days_until >= 0).slice(0, 3);
+
+  // Days together
+  let daysTogether: number | null = null;
+  if (household.anniversary) {
+    const start = new Date(household.anniversary);
+    const now = new Date();
+    daysTogether = Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Hero stats */}
+      <div className="rounded-2xl bg-gradient-to-br from-rose-900/30 to-stone-900 border border-rose-800/20 p-8 text-center">
+        <p className="text-5xl mb-2">👑</p>
+        <h2 className="text-2xl font-bold text-stone-100">{household.name}</h2>
+        {daysTogether != null && daysTogether >= 0 && (
+          <div className="mt-4">
+            <span className="text-4xl font-bold text-rose-400 tabular-nums">
+              {daysTogether.toLocaleString()}
+            </span>
+            <p className="text-sm text-stone-400 mt-1">days together</p>
+          </div>
+        )}
+        {!household.user_b_id && household.invite_code && (
+          <div className="mt-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
+            <p className="text-sm text-rose-300">Share this code with your partner</p>
+            <p className="text-2xl font-mono font-bold text-rose-400 mt-1 tracking-widest">
+              {household.invite_code}
+            </p>
+          </div>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        {/* Memory count */}
+        <button
+          onClick={() => onNavigate("timeline")}
+          className="rounded-2xl bg-stone-900/80 border border-stone-800/60 p-5 text-left hover:border-stone-700/60 transition-colors"
+        >
+          <span className="text-3xl font-bold text-stone-100 tabular-nums">{memoryCount}</span>
+          <p className="text-sm text-stone-400 mt-1">
+            memor{memoryCount === 1 ? "y" : "ies"} saved
+          </p>
+        </button>
+
+        {/* Milestones count */}
+        <button
+          onClick={() => onNavigate("milestones")}
+          className="rounded-2xl bg-stone-900/80 border border-stone-800/60 p-5 text-left hover:border-stone-700/60 transition-colors"
+        >
+          <span className="text-3xl font-bold text-stone-100 tabular-nums">{milestones.length}</span>
+          <p className="text-sm text-stone-400 mt-1">milestones tracked</p>
+        </button>
+      </div>
+
+      {/* Upcoming milestones */}
+      {upcoming.length > 0 && (
+        <div className="rounded-2xl bg-stone-900/80 border border-stone-800/60 p-5">
+          <h3 className="text-sm font-medium text-stone-400 mb-3">Coming Up</h3>
+          <div className="space-y-3">
+            {upcoming.map((m) => (
+              <div key={m.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{m.icon || "📌"}</span>
+                  <div>
+                    <p className="text-sm text-stone-200">{m.title}</p>
+                    <p className="text-xs text-stone-500">{m.milestone_date}</p>
+                  </div>
+                </div>
+                <span className="text-sm font-semibold text-rose-400 tabular-nums">
+                  {m.days_until === 0 ? "Today!" : `${m.days_until}d`}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Recent memories */}
+      {recent.length > 0 && (
+        <div className="rounded-2xl bg-stone-900/80 border border-stone-800/60 p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-stone-400">Recent Memories</h3>
+            <button
+              onClick={() => onNavigate("timeline")}
+              className="text-xs text-stone-500 hover:text-stone-300"
+            >
+              View all
+            </button>
+          </div>
+          <div className="space-y-2">
+            {recent.map((m) => (
+              <div key={m.id} className="flex items-center gap-3">
+                {m.photos.length > 0 ? (
+                  <img
+                    src={api.photoUrl(m.photos[0].id)}
+                    alt=""
+                    className="w-10 h-10 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-lg bg-stone-800 flex items-center justify-center text-sm">
+                    {m.mood || "📝"}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-stone-200 truncate">{m.title}</p>
+                  <p className="text-xs text-stone-500">{m.memory_date}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

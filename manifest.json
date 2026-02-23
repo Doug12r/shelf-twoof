@@ -1,0 +1,16 @@
+{
+  "id": "twoof",
+  "name": "TwoOf",
+  "description": "Shared memory timeline, date wishlist, and milestone tracker for couples.",
+  "version": "1.0.0",
+  "icon": "\ud83d\udc91",
+  "port": 3001,
+  "db_schema": "twoof",
+  "path_prefix": "/twoof",
+  "auth_required": true,
+  "partner_mode": true,
+  "env": [],
+  "optional_env": [],
+  "category": "personal-life",
+  "features": ["partner_mode", "file_uploads", "timeline"]
+}

@@ -16,7 +16,7 @@ export default function PhotoGallery({ photos, onDelete }: Props) {
       "grid-cols-2 sm:grid-cols-3"
     }`}>
       {photos.map((p) => (
-        <div key={p.id} className="relative group rounded-xl overflow-hidden bg-stone-800">
+        <div key={p.id} className="relative group rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 shadow-sm">
           <img
             src={api.photoUrl(p.id)}
             alt={p.filename}
@@ -29,7 +29,7 @@ export default function PhotoGallery({ photos, onDelete }: Props) {
                 e.stopPropagation();
                 if (confirm("Remove this photo?")) onDelete(p.id);
               }}
-              className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity apple-button"
             >
               x
             </button>

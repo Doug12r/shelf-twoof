@@ -12,7 +12,7 @@ export default function MemoryCard({ memory, onClick }: Props) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left rounded-2xl bg-stone-900/80 border border-stone-800/60 hover:border-stone-700/60 transition-all overflow-hidden group"
+      className="w-full text-left apple-card rounded-2xl shadow-md overflow-hidden group card-enter apple-button"
     >
       {/* Photo preview */}
       {hasPhotos && (
@@ -29,7 +29,7 @@ export default function MemoryCard({ memory, onClick }: Props) {
             </span>
           )}
           {memory.pinned && (
-            <span className="absolute top-2 left-2 text-xs bg-rose-600/90 text-white px-2 py-0.5 rounded-full">
+            <span className="absolute top-2 left-2 text-xs bg-gradient-to-r from-rose-500 to-rose-600 text-white px-2 py-0.5 rounded-full">
               Pinned
             </span>
           )}
@@ -38,7 +38,7 @@ export default function MemoryCard({ memory, onClick }: Props) {
 
       <div className="p-4">
         {!hasPhotos && memory.pinned && (
-          <span className="text-xs bg-rose-500/20 text-rose-400 px-2 py-0.5 rounded-full mb-2 inline-block">
+          <span className="text-xs bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full mb-2 inline-block">
             Pinned
           </span>
         )}
@@ -46,15 +46,15 @@ export default function MemoryCard({ memory, onClick }: Props) {
         <div className="flex items-start gap-2">
           {memory.mood && <span className="text-lg shrink-0">{memory.mood}</span>}
           <div className="min-w-0">
-            <h3 className="text-base font-semibold text-stone-100 truncate">
+            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100 truncate">
               {memory.title}
             </h3>
             <div className="flex items-center gap-1.5 mt-1">
-              <span className="text-xs text-stone-500">{memory.memory_date}</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400">{memory.memory_date}</span>
               {memory.location && (
                 <>
-                  <span className="text-xs text-stone-700">&middot;</span>
-                  <span className="text-xs text-stone-500 truncate">{memory.location}</span>
+                  <span className="text-xs text-slate-300 dark:text-slate-600">&middot;</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 truncate">{memory.location}</span>
                 </>
               )}
             </div>
@@ -62,7 +62,7 @@ export default function MemoryCard({ memory, onClick }: Props) {
         </div>
 
         {memory.content && (
-          <p className="text-sm text-stone-400 mt-2 line-clamp-2 leading-relaxed">
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">
             {memory.content}
           </p>
         )}
@@ -72,7 +72,7 @@ export default function MemoryCard({ memory, onClick }: Props) {
             {memory.tags.map((t) => (
               <span
                 key={t}
-                className="text-xs px-2 py-0.5 rounded-full bg-stone-800 text-stone-400"
+                className="text-xs px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400"
               >
                 {t}
               </span>

@@ -31,23 +31,23 @@ export default function Overview({ household, onNavigate }: Props) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 animate-fadeIn">
       {/* Hero stats */}
-      <div className="rounded-2xl bg-gradient-to-br from-rose-900/30 to-stone-900 border border-rose-800/20 p-8 text-center">
-        <p className="text-5xl mb-2">👑</p>
-        <h2 className="text-2xl font-bold text-stone-100">{household.name}</h2>
+      <div className="apple-card rounded-2xl shadow-md p-8 text-center card-enter bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/30 dark:to-gray-900/80">
+        <p className="text-5xl mb-2">💕</p>
+        <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{household.name}</h2>
         {daysTogether != null && daysTogether >= 0 && (
           <div className="mt-4">
-            <span className="text-4xl font-bold text-rose-400 tabular-nums">
+            <span className="text-4xl font-bold text-rose-600 dark:text-rose-400 tabular-nums">
               {daysTogether.toLocaleString()}
             </span>
-            <p className="text-sm text-stone-400 mt-1">days together</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">days together</p>
           </div>
         )}
         {!household.user_b_id && household.invite_code && (
-          <div className="mt-6 p-4 rounded-xl bg-rose-500/10 border border-rose-500/20">
-            <p className="text-sm text-rose-300">Share this code with your partner</p>
-            <p className="text-2xl font-mono font-bold text-rose-400 mt-1 tracking-widest">
+          <div className="mt-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-500/20">
+            <p className="text-sm text-rose-600 dark:text-rose-400">Share this code with your partner</p>
+            <p className="text-2xl font-mono font-bold text-rose-600 dark:text-rose-400 mt-1 tracking-widest">
               {household.invite_code}
             </p>
           </div>
@@ -58,10 +58,10 @@ export default function Overview({ household, onNavigate }: Props) {
         {/* Memory count */}
         <button
           onClick={() => onNavigate("timeline")}
-          className="rounded-2xl bg-stone-900/80 border border-stone-800/60 p-5 text-left hover:border-stone-700/60 transition-colors"
+          className="apple-card rounded-2xl shadow-md p-5 text-left card-enter apple-button"
         >
-          <span className="text-3xl font-bold text-stone-100 tabular-nums">{memoryCount}</span>
-          <p className="text-sm text-stone-400 mt-1">
+          <span className="text-3xl font-bold text-gray-800 dark:text-gray-100 tabular-nums">{memoryCount}</span>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
             memor{memoryCount === 1 ? "y" : "ies"} saved
           </p>
         </button>
@@ -69,28 +69,28 @@ export default function Overview({ household, onNavigate }: Props) {
         {/* Milestones count */}
         <button
           onClick={() => onNavigate("milestones")}
-          className="rounded-2xl bg-stone-900/80 border border-stone-800/60 p-5 text-left hover:border-stone-700/60 transition-colors"
+          className="apple-card rounded-2xl shadow-md p-5 text-left card-enter apple-button"
         >
-          <span className="text-3xl font-bold text-stone-100 tabular-nums">{milestones.length}</span>
-          <p className="text-sm text-stone-400 mt-1">milestones tracked</p>
+          <span className="text-3xl font-bold text-gray-800 dark:text-gray-100 tabular-nums">{milestones.length}</span>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">milestones tracked</p>
         </button>
       </div>
 
       {/* Upcoming milestones */}
       {upcoming.length > 0 && (
-        <div className="rounded-2xl bg-stone-900/80 border border-stone-800/60 p-5">
-          <h3 className="text-sm font-medium text-stone-400 mb-3">Coming Up</h3>
+        <div className="apple-card rounded-2xl shadow-md p-5 card-enter">
+          <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-3">Coming Up</h3>
           <div className="space-y-3">
             {upcoming.map((m) => (
               <div key={m.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{m.icon || "📌"}</span>
+                  <span className="text-lg">{m.icon || "\uD83D\uDCCC"}</span>
                   <div>
-                    <p className="text-sm text-stone-200">{m.title}</p>
-                    <p className="text-xs text-stone-500">{m.milestone_date}</p>
+                    <p className="text-sm text-gray-800 dark:text-gray-100">{m.title}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{m.milestone_date}</p>
                   </div>
                 </div>
-                <span className="text-sm font-semibold text-rose-400 tabular-nums">
+                <span className="text-sm font-semibold text-rose-600 dark:text-rose-400 tabular-nums">
                   {m.days_until === 0 ? "Today!" : `${m.days_until}d`}
                 </span>
               </div>
@@ -101,12 +101,12 @@ export default function Overview({ household, onNavigate }: Props) {
 
       {/* Recent memories */}
       {recent.length > 0 && (
-        <div className="rounded-2xl bg-stone-900/80 border border-stone-800/60 p-5">
+        <div className="apple-card rounded-2xl shadow-md p-5 card-enter">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium text-stone-400">Recent Memories</h3>
+            <h3 className="text-sm font-semibold text-slate-600 dark:text-slate-300">Recent Memories</h3>
             <button
               onClick={() => onNavigate("timeline")}
-              className="text-xs text-stone-500 hover:text-stone-300"
+              className="text-xs text-rose-600 dark:text-rose-400 hover:text-rose-700 dark:hover:text-rose-300 font-medium apple-button"
             >
               View all
             </button>
@@ -121,13 +121,13 @@ export default function Overview({ household, onNavigate }: Props) {
                     className="w-10 h-10 rounded-lg object-cover"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-stone-800 flex items-center justify-center text-sm">
-                    {m.mood || "📝"}
+                  <div className="w-10 h-10 rounded-lg bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-sm">
+                    {m.mood || "\uD83D\uDCDD"}
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm text-stone-200 truncate">{m.title}</p>
-                  <p className="text-xs text-stone-500">{m.memory_date}</p>
+                  <p className="text-sm text-gray-800 dark:text-gray-100 truncate">{m.title}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">{m.memory_date}</p>
                 </div>
               </div>
             ))}

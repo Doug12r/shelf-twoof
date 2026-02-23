@@ -9,6 +9,8 @@ import MemoryEditor from "./components/MemoryEditor";
 import DateIdeas from "./components/DateIdeas";
 import MilestoneList from "./components/MilestoneList";
 import SearchBar from "./components/SearchBar";
+import { useToast } from "./hooks/useToast";
+import { ToastContainer } from "./components/Toast";
 
 type View =
   | { kind: "overview" }
@@ -25,6 +27,7 @@ export default function App() {
   const [household, setHousehold] = useState<Household | null>(null);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<View>({ kind: "overview" });
+  const { toasts, showToast } = useToast();
 
   const loadHousehold = useCallback(async () => {
     try {
@@ -57,116 +60,132 @@ export default function App() {
     else if (tab === "milestones") setView({ kind: "milestones" });
   };
 
+  const tabs: { id: Tab; label: string; icon: string }[] = [
+    { id: "overview", label: "Home", icon: "\uD83D\uDC95" },
+    { id: "timeline", label: "Timeline", icon: "\uD83D\uDCC5" },
+    { id: "dates", label: "Date Ideas", icon: "\uD83D\uDCA1" },
+    { id: "milestones", label: "Milestones", icon: "\uD83C\uDFAF" },
+  ];
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-stone-950 flex items-center justify-center">
-        <p className="text-stone-500">Loading...</p>
+      <div className="min-h-screen bg-slate-50 dark:bg-gray-950 flex items-center justify-center">
+        <div className="text-center animate-fadeIn">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 mx-auto mb-3 animate-pulse" />
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Loading...</p>
+        </div>
       </div>
     );
   }
 
   if (!household) {
     return (
-      <div className="min-h-screen bg-stone-950 text-stone-100">
-        <div className="max-w-5xl mx-auto px-6 py-8">
+      <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100">
+        <div className="max-w-lg mx-auto px-4 py-8">
           <HouseholdSetup onDone={(h) => setHousehold(h)} />
         </div>
+        <ToastContainer toasts={toasts} />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-stone-950 text-stone-100">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        {/* Header */}
-        <header className="mb-8 flex items-start justify-between">
-          <div>
+    <div className="min-h-screen bg-slate-50 dark:bg-gray-950 text-gray-800 dark:text-gray-100">
+      {/* Glassmorphism header */}
+      <header className="apple-card sticky top-0 z-40 border-b border-white/20 dark:border-white/5 rounded-none px-4 py-3">
+        <div className="max-w-lg mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <h1
               onClick={() => setView({ kind: "overview" })}
-              className="text-2xl font-bold text-stone-100 cursor-pointer hover:text-rose-300 transition-colors"
+              className="text-xl font-bold text-gray-800 dark:text-gray-100 cursor-pointer hover:text-rose-600 dark:hover:text-rose-400 transition-colors apple-button"
             >
-              TwoOf <span className="text-rose-500">.</span>
+              TwoOf<span className="text-rose-500 ml-0.5">.</span>
             </h1>
-            <p className="text-sm text-stone-500 mt-0.5">{household.name}</p>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{household.name}</span>
           </div>
           <button
             onClick={() => api.exportData()}
-            className="text-xs px-3 py-1.5 rounded-xl bg-stone-800/60 text-stone-400 hover:bg-stone-700 hover:text-stone-200 transition-colors"
+            className="apple-card rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 apple-button shadow-sm"
           >
-            Export Data
+            Export
           </button>
-        </header>
+        </div>
+      </header>
 
+      <div className="max-w-lg mx-auto px-4 pb-32 pt-4">
         {/* Search */}
-        <div className="mb-6">
+        <div className="mb-5">
           <SearchBar onSelect={(id) => setView({ kind: "memory-detail", memoryId: id })} />
         </div>
 
-        {/* Nav */}
-        <nav className="flex gap-1 mb-8 border-b border-stone-800/60 pb-px">
-          {(
-            [
-              { id: "overview", label: "Home" },
-              { id: "timeline", label: "Memories" },
-              { id: "dates", label: "Date Ideas" },
-              { id: "milestones", label: "Milestones" },
-            ] as { id: Tab; label: string }[]
-          ).map((tab) => (
+        {/* Views */}
+        <div className="animate-fadeIn">
+          {view.kind === "overview" && (
+            <Overview household={household} onNavigate={navigateTab} />
+          )}
+
+          {view.kind === "timeline" && (
+            <Timeline
+              onSelect={(m) => setView({ kind: "memory-detail", memoryId: m.id })}
+              onAdd={() => setView({ kind: "add-memory" })}
+            />
+          )}
+
+          {view.kind === "memory-detail" && (
+            <MemoryDetail
+              memoryId={view.memoryId}
+              onBack={() => setView({ kind: "timeline" })}
+              onEdit={(m) => setView({ kind: "edit-memory", memory: m })}
+              onDeleted={() => setView({ kind: "timeline" })}
+              showToast={showToast}
+            />
+          )}
+
+          {view.kind === "add-memory" && (
+            <MemoryEditor
+              memory={null}
+              onSaved={(m) => setView({ kind: "memory-detail", memoryId: m.id })}
+              onCancel={() => setView({ kind: "timeline" })}
+              showToast={showToast}
+            />
+          )}
+
+          {view.kind === "edit-memory" && (
+            <MemoryEditor
+              memory={view.memory}
+              onSaved={(m) => setView({ kind: "memory-detail", memoryId: m.id })}
+              onCancel={() => setView({ kind: "memory-detail", memoryId: view.memory.id })}
+              showToast={showToast}
+            />
+          )}
+
+          {view.kind === "dates" && <DateIdeas showToast={showToast} />}
+
+          {view.kind === "milestones" && <MilestoneList showToast={showToast} />}
+        </div>
+      </div>
+
+      {/* Bottom tab bar */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 apple-card rounded-none border-t border-white/20 dark:border-white/5 pb-[env(safe-area-inset-bottom)]">
+        <div className="max-w-lg mx-auto flex">
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => navigateTab(tab.id)}
-              className={`px-4 py-2.5 text-sm rounded-t-xl transition-colors ${
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium apple-button transition-colors ${
                 currentTab === tab.id
-                  ? "text-rose-400 border-b-2 border-rose-400 -mb-px"
-                  : "text-stone-500 hover:text-stone-300"
+                  ? "text-rose-600 dark:text-rose-400"
+                  : "text-slate-400 dark:text-slate-500"
               }`}
             >
+              <span className="text-lg leading-none">{tab.icon}</span>
               {tab.label}
             </button>
           ))}
-        </nav>
+        </div>
+      </nav>
 
-        {/* Views */}
-        {view.kind === "overview" && (
-          <Overview household={household} onNavigate={navigateTab} />
-        )}
-
-        {view.kind === "timeline" && (
-          <Timeline
-            onSelect={(m) => setView({ kind: "memory-detail", memoryId: m.id })}
-            onAdd={() => setView({ kind: "add-memory" })}
-          />
-        )}
-
-        {view.kind === "memory-detail" && (
-          <MemoryDetail
-            memoryId={view.memoryId}
-            onBack={() => setView({ kind: "timeline" })}
-            onEdit={(m) => setView({ kind: "edit-memory", memory: m })}
-            onDeleted={() => setView({ kind: "timeline" })}
-          />
-        )}
-
-        {view.kind === "add-memory" && (
-          <MemoryEditor
-            memory={null}
-            onSaved={(m) => setView({ kind: "memory-detail", memoryId: m.id })}
-            onCancel={() => setView({ kind: "timeline" })}
-          />
-        )}
-
-        {view.kind === "edit-memory" && (
-          <MemoryEditor
-            memory={view.memory}
-            onSaved={(m) => setView({ kind: "memory-detail", memoryId: m.id })}
-            onCancel={() => setView({ kind: "memory-detail", memoryId: view.memory.id })}
-          />
-        )}
-
-        {view.kind === "dates" && <DateIdeas />}
-
-        {view.kind === "milestones" && <MilestoneList />}
-      </div>
+      <ToastContainer toasts={toasts} />
     </div>
   );
 }

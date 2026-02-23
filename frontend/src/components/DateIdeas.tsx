@@ -3,7 +3,9 @@ import type { DateIdea } from "../types";
 import * as api from "../api";
 import DateIdeaEditor from "./DateIdeaEditor";
 
-interface Props {}
+interface Props {
+  showToast?: (message: string, type?: "success" | "error") => void;
+}
 
 const CATEGORIES = [
   { value: "", label: "All" },
@@ -22,7 +24,7 @@ const PRIORITY_LABELS: Record<number, string> = {
   3: "Must do!",
 };
 
-export default function DateIdeas({}: Props) {
+export default function DateIdeas({ showToast }: Props) {
   const [ideas, setIdeas] = useState<DateIdea[]>([]);
   const [filter, setFilter] = useState<"all" | "todo" | "done">("todo");
   const [catFilter, setCatFilter] = useState("");
@@ -49,6 +51,7 @@ export default function DateIdeas({}: Props) {
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this date idea?")) return;
     await api.deleteDateIdea(id);
+    showToast?.("Date idea deleted");
     load();
   };
 
@@ -65,17 +68,18 @@ export default function DateIdeas({}: Props) {
           setShowEditor(false);
           setEditIdea(null);
         }}
+        showToast={showToast}
       />
     );
   }
 
   return (
-    <div>
+    <div className="animate-fadeIn">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-lg font-bold text-stone-100">Date Ideas</h2>
+        <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Date Ideas</h2>
         <button
           onClick={() => setShowEditor(true)}
-          className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition-colors"
+          className="bg-gradient-to-r from-rose-500 to-rose-600 text-white px-5 py-3 rounded-xl font-semibold apple-button shadow-sm text-sm"
         >
           + Add Idea
         </button>
@@ -87,11 +91,11 @@ export default function DateIdeas({}: Props) {
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+            className={
               filter === f
-                ? "bg-rose-600/20 text-rose-400 border border-rose-500/40"
-                : "bg-stone-800 text-stone-400 border border-stone-700/50 hover:bg-stone-700"
-            }`}
+                ? "bg-gradient-to-r from-rose-500 to-rose-600 text-white rounded-full px-4 py-2 text-sm font-medium apple-button shadow-sm"
+                : "apple-card rounded-full px-4 py-2 text-sm font-medium text-slate-500 dark:text-slate-400 apple-button shadow-sm"
+            }
           >
             {f === "all" ? "All" : f === "todo" ? "To Do" : "Done"}
           </button>
@@ -99,7 +103,7 @@ export default function DateIdeas({}: Props) {
         <select
           value={catFilter}
           onChange={(e) => setCatFilter(e.target.value)}
-          className="rounded-xl bg-stone-800 border border-stone-700/50 px-3 py-1.5 text-sm text-stone-300 focus:outline-none focus:border-rose-500/40"
+          className="modern-input rounded-full px-4 py-2 text-sm"
         >
           {CATEGORIES.map((c) => (
             <option key={c.value} value={c.value}>{c.label}</option>
@@ -108,29 +112,27 @@ export default function DateIdeas({}: Props) {
       </div>
 
       {ideas.length === 0 ? (
-        <div className="text-center py-16">
+        <div className="apple-card rounded-2xl shadow-md p-12 text-center card-enter">
           <p className="text-4xl mb-3">💡</p>
-          <p className="text-stone-400">No date ideas yet.</p>
-          <p className="text-stone-500 text-sm mt-1">Start building your wishlist together.</p>
+          <p className="text-gray-800 dark:text-gray-100 font-medium">No date ideas yet.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Start building your wishlist together.</p>
         </div>
       ) : (
         <div className="space-y-2">
           {ideas.map((d) => (
             <div
               key={d.id}
-              className={`p-4 rounded-2xl border transition-colors ${
-                d.done
-                  ? "bg-stone-900/40 border-stone-800/40"
-                  : "bg-stone-900/80 border-stone-800/60 hover:border-stone-700/60"
+              className={`apple-card rounded-2xl shadow-md p-4 card-enter ${
+                d.done ? "opacity-70" : ""
               }`}
             >
               <div className="flex items-start gap-3">
                 <button
                   onClick={() => handleToggle(d.id)}
-                  className={`w-6 h-6 rounded-full border-2 shrink-0 mt-0.5 flex items-center justify-center transition-colors ${
+                  className={`w-6 h-6 rounded-full border-2 shrink-0 mt-0.5 flex items-center justify-center transition-colors apple-button ${
                     d.done
                       ? "border-rose-500 bg-rose-500 text-white"
-                      : "border-stone-600 hover:border-rose-500"
+                      : "border-slate-300 dark:border-slate-600 hover:border-rose-500"
                   }`}
                 >
                   {d.done && (
@@ -140,42 +142,42 @@ export default function DateIdeas({}: Props) {
                   )}
                 </button>
                 <div className="flex-1 min-w-0">
-                  <p className={`font-medium ${d.done ? "text-stone-500 line-through" : "text-stone-200"}`}>
+                  <p className={`font-medium ${d.done ? "text-slate-400 dark:text-slate-500 line-through" : "text-gray-800 dark:text-gray-100"}`}>
                     {d.title}
                   </p>
                   {d.description && (
-                    <p className="text-sm text-stone-500 mt-0.5 line-clamp-2">{d.description}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{d.description}</p>
                   )}
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     {d.category && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-stone-800 text-stone-400">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400">
                         {d.category}
                       </span>
                     )}
                     {d.estimated_cost && (
-                      <span className="text-xs text-stone-500">{d.estimated_cost}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">{d.estimated_cost}</span>
                     )}
                     {d.location && (
-                      <span className="text-xs text-stone-500">{d.location}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">{d.location}</span>
                     )}
                     {d.priority > 0 && (
-                      <span className="text-xs text-rose-400">{PRIORITY_LABELS[d.priority]}</span>
+                      <span className="text-xs text-rose-600 dark:text-rose-400 font-medium">{PRIORITY_LABELS[d.priority]}</span>
                     )}
                     {d.done_date && (
-                      <span className="text-xs text-stone-600">Done {d.done_date}</span>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">Done {d.done_date}</span>
                     )}
                   </div>
                 </div>
                 <div className="flex gap-1 shrink-0">
                   <button
                     onClick={() => setEditIdea(d)}
-                    className="text-xs px-2 py-1 rounded-lg bg-stone-800 text-stone-400 hover:bg-stone-700 transition-colors"
+                    className="apple-card rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 apple-button shadow-sm text-xs"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(d.id)}
-                    className="text-xs px-2 py-1 rounded-lg bg-stone-800 text-red-400 hover:bg-stone-700 transition-colors"
+                    className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl px-4 py-2.5 text-sm font-medium apple-button text-xs"
                   >
                     Del
                   </button>

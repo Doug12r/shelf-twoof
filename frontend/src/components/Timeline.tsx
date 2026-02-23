@@ -37,17 +37,17 @@ export default function Timeline({ onSelect, onAdd }: Props) {
   const years = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
   return (
-    <div>
+    <div className="animate-fadeIn">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold text-stone-100">Timeline</h2>
+          <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Timeline</h2>
           <select
             value={filterYear}
             onChange={(e) => {
               setFilterYear(e.target.value);
               setPage(1);
             }}
-            className="rounded-xl bg-stone-800/60 border border-stone-700/50 px-3 py-1.5 text-sm text-stone-300 focus:outline-none focus:border-rose-500/40"
+            className="modern-input rounded-full px-4 py-2 text-sm"
           >
             <option value="">All time</option>
             {years.map((y) => (
@@ -57,19 +57,22 @@ export default function Timeline({ onSelect, onAdd }: Props) {
         </div>
         <button
           onClick={onAdd}
-          className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-sm font-medium transition-colors"
+          className="bg-gradient-to-r from-rose-500 to-rose-600 text-white px-5 py-3 rounded-xl font-semibold apple-button shadow-sm text-sm"
         >
           + New Memory
         </button>
       </div>
 
       {loading ? (
-        <p className="text-stone-500 text-sm py-12 text-center">Loading...</p>
+        <div className="text-center py-12">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-r from-rose-500 to-rose-600 mx-auto mb-3 animate-pulse" />
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Loading...</p>
+        </div>
       ) : memories.length === 0 ? (
-        <div className="text-center py-16">
+        <div className="apple-card rounded-2xl shadow-md p-12 text-center card-enter">
           <p className="text-4xl mb-3">📸</p>
-          <p className="text-stone-400">No memories yet.</p>
-          <p className="text-stone-500 text-sm mt-1">Start capturing your story together.</p>
+          <p className="text-gray-800 dark:text-gray-100 font-medium">No memories yet.</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Start capturing your story together.</p>
         </div>
       ) : (
         <>
@@ -84,17 +87,17 @@ export default function Timeline({ onSelect, onAdd }: Props) {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="px-3 py-1.5 rounded-lg bg-stone-800 text-stone-400 text-sm disabled:opacity-30 hover:bg-stone-700 transition-colors"
+                className="apple-card rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 apple-button shadow-sm disabled:opacity-30"
               >
                 Prev
               </button>
-              <span className="text-sm text-stone-500">
+              <span className="text-sm text-slate-500 dark:text-slate-400 tabular-nums">
                 {page} / {totalPages}
               </span>
               <button
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page >= totalPages}
-                className="px-3 py-1.5 rounded-lg bg-stone-800 text-stone-400 text-sm disabled:opacity-30 hover:bg-stone-700 transition-colors"
+                className="apple-card rounded-xl px-4 py-2.5 text-sm font-medium text-slate-600 dark:text-slate-300 apple-button shadow-sm disabled:opacity-30"
               >
                 Next
               </button>
